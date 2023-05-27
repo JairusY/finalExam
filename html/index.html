@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Students Information</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/fontawesome.min.css" integrity="sha512-SgaqKKxJDQ/tAUAAXzvxZz33rmn7leYDYfBP+YoMRSENhf3zJyx3SBASt/OfeQwBHA1nxMis7mM3EV/oYT6Fdw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+  <body class="bg-light">
+    <div class="container my-5 pt-5">
+      <div class="w-75">
+        <h3 style="background-color: rgb(104, 104, 104); color: white;" class="mb-5">Student Information</h3>
+        <div class="d-flex justify-content-end gap-3">
+            <div id="btnHide">           
+            </div>
+        </div>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Course</th>
+                <th scope="col">Address</th>
+              </tr>
+            </thead>
+            <tbody id="students">
+
+            </tbody>
+        </table>
+      <br>
+      <br>
+    </div>
+      <div class="d-flex justify-content-around">
+        <div class="w-100">
+            <h3 style="background-color: rgb(104, 104, 104); color: white;">Provide the requested Information</h3>
+      <form method="post" >
+        <div class="form-row">
+          <div class="col-md-4 mb-3">
+            <label for="id">ID</label>
+            <input type="text" class="form-control w-100" name="id" id="id" placeholder="" readonly>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" name="name" id="name" placeholder="First name" required>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="address">Address</label>
+            <div class="input-group">
+              <input type="text" class="form-control" name="address" id="address" placeholder="Address" required>
+            </div>
+          </div>
+          <label for="course" class="form-label">Course</label>
+            <select id="course" class="form-select" aria-label="Default" required>
+            <option value="" selected disabled>Select Course</option>
+            <option value="BSBA">BSBA</option>
+            <option value="BSED">BSED</option>
+            <option value="BSTM">BSTM</option>
+            <option value="BSIT">BSIT</option>
+            <option value="BSHM">BSHM</option>
+            <option value="BSA">BSA</option>
+            <option value="BSBA">BSBA</option>
+            <option value="BSCRIM">BSCRIM</option>
+            <option value="BEED">BEED</option>
+            <option value="PolSci">PolSci</option>
+            </select>
+            <div class="invalid-feedback">
+            Please select a valid course.
+            </div>
+        </div>
+        <br>
+        <br>
+        <hr>
+        <button type="submit" class="btn btn-dark" onclick="add_record()">Add Student</button>
+      </form>
+        </div>
+      </div>
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.js" integrity="sha512-6DC1eE3AWg1bgitkoaRM1lhY98PxbMIbhgYCGV107aZlyzzvaWCW1nJW2vDuYQm06hXrW0As6OGKcIaAVWnHJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js" integrity="sha512-wOLiP6uL5tNrV1FiutKtAyQGGJ1CWAsqQ6Kp2XZ12/CvZxw8MvNJfdhh0yTwjPIir4SWag2/MHrseR7PRmNtvA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      $(document).ready(function() {
+          $.ajax({
+              url: "http://finalexam.test/students",
+              type: "GET", 
+              success: function(response) {
+                  txt = "";
+                  for(var item of response){
+                      txt += 
+                      `
+                      <tr>
+                          <th scope="row">${item.id}</th>
+                          <td>${item.name}</td>
+                          <td>${item.course}</td>
+                          <td>${item.address}</td>
+                          <td>
+                            <button class="btn btn-outline-dark btn-sm" onclick="select_record(${item.id})">Select</button>
+                          </td>
+                      </tr>
+                      
+                      `;
+                      document.getElementById("students").innerHTML = txt;
+                  }
+              },
+          })
+      });
+
+      function add_record() {
+            var data = {
+                name : document.getElementById("name").value,
+                course : document.getElementById("course").value,
+                address : document.getElementById("address").value,
+            }
+            $(document).ready(function() {
+                  $.ajax({
+                      url: "http://finalexam.test/students/add",
+                      type: "POST",
+                      data: JSON.stringify(data),
+                      success: function(response) {
+                        alert("Record Added");
+                        window.location.href = 'index.html';
+                      },
+                  });
+                })
+        }
+        
+      function select_record(id) {
+            $.ajax({
+                url: `http://finalexam.test/students/${id}`,
+                type: "GET",
+                success: function(response) {
+                    var txt = "";
+                  for(var item of response){
+                    document.getElementById("id").value = item.id;
+                    document.getElementById("name").value = item.name;
+                    document.getElementById("address").value = item.address;
+                    document.getElementById("course").value = item.course;
+
+                  }
+                  txt += 
+                  `
+                      <button class="btn btn-success "onclick="update_record()">Update</button>
+                      <button class="btn btn-danger " onclick="delete_record()" >Delete</button>
+                  `;
+                  document.getElementById("btnHide").innerHTML = txt;
+
+                },
+                error: function(xhr, status, error) {
+
+                }
+            });
+        }
+        function update_record(){
+          const id = document.getElementById("id").value
+          var data = {
+                name : document.getElementById("name").value,
+                address : document.getElementById("address").value,
+                course : document.getElementById("course").value,
+          };
+          $.ajax({
+              url: `http://finalexam.test/students/update/${id}`,
+              type: "PUT",
+              contentType: "application/json; charset=utf-8",
+              data: JSON.stringify(data),
+              complete: function(response) {
+                alert("Record Updated");
+                window.location.href = 'index.html';
+              },
+          });
+      }
+        function delete_record() {
+            const id = document.getElementById("id").value
+            $.ajax({
+                url: `http://finalexam.test/students/delete/${id}`,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                complete: function(response) {
+                  alert("Record Deleted");
+                  window.location.href = 'index.html';
+                },
+            });
+        }
+    </script>
+  </body>
+</html>
